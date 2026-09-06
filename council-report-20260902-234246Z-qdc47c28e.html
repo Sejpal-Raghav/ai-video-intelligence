@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM Council — Review the revised Temporal Scene Intelligence architecture</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;font-size:15px;line-height:1.6;color:#1a1a1a;background:#f5f5f0;padding:2rem 1rem}
+    .container{max-width:800px;margin:0 auto}.header,.card{background:#fff;border:1px solid #e0e0d8;border-radius:8px;margin-bottom:1.25rem}.header{padding:1.5rem 2rem}.header h1{font-size:1.25rem;font-weight:600;color:#2d5a88;margin-bottom:.25rem}.meta{font-size:.8rem;color:#888;display:flex;gap:1rem;flex-wrap:wrap;align-items:center}.badge{background:#e8f0fb;color:#2d5a88;padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:500}
+    .confidence-block{border-radius:6px;padding:.75rem 1rem;margin-bottom:1.5rem;font-size:.875rem;border-left:4px solid}.confidence-high{background:#f0faf0;border-color:#4caf50}.confidence-block strong{display:block;margin-bottom:.25rem}.card{overflow:hidden}.card-title{padding:.875rem 1.5rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#666;border-bottom:1px solid #e0e0d8;background:#fafaf8}.card-body{padding:1.25rem 1.5rem}.question-text{background:#f8f8f5;border-left:3px solid #2d5a88;padding:.875rem 1rem;border-radius:0 4px 4px 0;font-size:.95rem;white-space:pre-wrap;word-break:break-word}.bias-flags{margin-top:.875rem;padding:.75rem 1rem;background:#fffde7;border:1px solid #f9e200;border-radius:6px;font-size:.8rem}.bias-flags strong{display:block;margin-bottom:.25rem;color:#856900}
+    .verdict h2{font-size:1rem;font-weight:600;margin:1.25rem 0 .5rem;color:#2d5a88;padding-top:1rem;border-top:1px solid #e8e8e0}.verdict h2:first-child{border-top:none;margin-top:0;padding-top:0}.verdict p{margin-bottom:.75rem}.verdict ul{padding-left:1.5rem;margin-bottom:.75rem}.verdict li{margin-bottom:.4rem}.dissent-ledger{margin-top:1.25rem;padding:1rem;background:#fff5f5;border:1px solid #ffcdd2;border-radius:6px}.dissent-ledger>strong{display:block;margin-bottom:.5rem;color:#b71c1c;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em}.dissent-ledger ul{padding-left:1.25rem;font-size:.9rem}.dissent-ledger li{margin-bottom:.4rem}.note{margin-top:.75rem;padding:.7rem;background:#fff8e1;border-left:3px solid #ff9800}
+    table{width:100%;border-collapse:collapse;font-size:.8rem}th{padding:.4rem .7rem;text-align:left;background:#f0f4fa;color:#2d5a88;font-weight:600;border:1px solid #dde4f0}td{padding:.4rem .7rem;border:1px solid #e8e8e0;vertical-align:top}.center{text-align:center}.score{font-weight:700;color:#2d5a88}
+    details{margin-bottom:.5rem}details summary{cursor:pointer;padding:.6rem 1rem;border-radius:4px;font-size:.85rem;font-weight:500;list-style:none;display:flex;align-items:center;gap:.5rem;background:#f8f8f5;border-left:3px solid #2d5a88}details summary::before{content:"▶";font-size:.7rem}details[open] summary::before{transform:rotate(90deg)}.detail-body{padding:.875rem 1rem .875rem 1.5rem;font-size:.875rem;border-left:3px solid #e0e0d8;margin-left:.5rem;white-space:pre-wrap;word-break:break-word}.conf-high{color:#2e7d32;font-weight:600}.debate-callout{background:#f9f9f9;border:1px solid #ddd;border-radius:6px;padding:1rem;font-size:.875rem}.debate-side{margin-bottom:.875rem}.debate-side strong{display:block;margin-bottom:.25rem;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}.prosecutor strong{color:#b71c1c}.defender strong{color:#1b5e20}footer{margin-top:2rem;padding-top:1rem;border-top:1px solid #e0e0d8;font-size:.75rem;color:#888;text-align:center}a{color:#2d5a88}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>LLM Council</h1>
+    <div class="meta"><span>2026-09-02T23:42:46Z</span><span class="badge">Standard</span></div>
+  </div>
+
+  <div class="confidence-block confidence-high">
+    <strong>Council confidence: high (5/5 high, 0/5 medium, 0/5 low)</strong>
+    <div>Dominant assumption: Demo reliability matters more than architectural breadth, and every differentiator must earn inclusion through measurable stage gates.</div>
+    <div>Breakers: unacceptable Day-1 tracking fragmentation on representative licensed footage; no repeatable upload → event → evidence path on target hardware by Day 2.</div>
+  </div>
+
+  <div class="card"><div class="card-title">Question</div><div class="card-body">
+    <div class="question-text">DECISION: Should a three-person team adopt the revised Temporal Scene Intelligence architecture for a six-day AI Video Intelligence for Warehouse Handling hackathon, and what should be kept, simplified, or removed to maximize technical differentiation without jeopardizing delivery?
+
+CONTEXT: Workspace scan: no project context found. Council proceeds with user-provided context only. The repository is empty. The team has five build days followed by one security/testing/polish day. The revised architecture proposes validated UUID-based video ingestion; a first-pass detector/tracker; track histories; a Temporal Scene Graph; cheap candidate generators followed by behavior-specific higher-FPS/high-resolution verification; five behavior categories across ten scenarios; configurable Python state machines; deterministic risk policies; a calibration UI; SQLite jobs; a generated TypeScript client; a grounded assistant; reproducible manifests; event-level evaluation; Next.js, FastAPI, Python and SQLite.
+
+STAKES: A fragile demo risks the submission. A generic detector dashboard may not differentiate, while over-engineering may prevent integration. Privacy, licensing, reproducibility and safe claims affect credibility.
+
+OPTIONS: full revised architecture; simpler YOLO-plus-rules dashboard; stage-gated hybrid with removable differentiators.</div>
+    <div class="bias-flags"><strong>Pre-council bias scan</strong>Signals, not verdicts: planning fallacy, anchoring on the detailed design, IKEA effect, and a narrative assumption that a scene graph necessarily differentiates.</div>
+  </div></div>
+
+  <div class="card"><div class="card-title">Council Verdict</div><div class="card-body verdict">
+    <h2>Where the council agrees</h2>
+    <ul>
+      <li>Adopt a stage-gated hybrid, not the full platform and not a permanently bare detector dashboard. Red Team, First Principles, Outsider and Executor all require an always-working baseline.</li>
+      <li>Establish the baseline by Day 2 and freeze expansion after Day 3. Red Team, First Principles, Outsider and the Defender support explicit cut points.</li>
+      <li>Retain secure UUID ingestion, compact track histories, deterministic policy, evidence clips and timestamps, decision traces, manifests and event-level tests. Red Team, First Principles, Expansionist and Executor converge here.</li>
+      <li>Keep targeted verification only when it produces a measured event-quality gain and place it behind a removable boundary. All five advisors converge on selective rather than universal two-pass processing.</li>
+      <li>Reduce semantic scope to one polished hero behavior plus one or two simpler behaviors. Red Team, Expansionist, Outsider and Executor prefer depth and proof over unreliable breadth.</li>
+      <li>Use one deterministic process, simple SQLite records and derived temporal features rather than a generalized graph or distributed verifier. Expansionist, Outsider, Executor and Defender support this.</li>
+      <li>Keep replay as a transparent development and failure fallback, never as an unlabeled substitute for live processing.</li>
+    </ul>
+    <h2>Where the council clashes</h2>
+    <p>The main clash is between a broad, polished YOLO-plus-rules demo and a narrower proof-carrying hybrid. The simple-demo side correctly warns that histories, verification, manifests and evaluation can still become an integration project. The hybrid remains more persuasive because its additions are removable and the baseline survives, but only if the implementation stays monolithic and its evidence is visible.</p>
+    <p>Replay is also contested. It improves determinism and resilience, but can damage trust if it masks weak live performance. It is acceptable only when explicitly labeled and paired with target-machine live measurements.</p>
+    <h2>Blind spots</h2>
+    <p>The architecture still lacks predeclared gates for ID switches, track fragmentation, event precision/recall, p95 latency, repeatability and maximum processing time. It also lacks confirmed licensed footage, ground-truth ownership, target-hardware benchmarks, rubric evidence and a concrete audit-day protocol. Day 6 must include a clean-room fresh-checkout run, dependency and model-license review, privacy and upload tests, regression, manifest verification and degraded-mode rehearsal.</p>
+    <h2>Recommendation</h2>
+    <p>Choose a stage-gated hybrid centered on one proof-carrying hero behavior plus one or two simpler behaviors. Build a monolithic FastAPI/Python/SQLite pipeline with a thin Next.js evidence-review UI; cut the generalized Temporal Scene Graph, assistant, generated client, privacy blur, broad taxonomy and generalized rule framework from the critical path. Admit targeted verification only after it improves event quality within the latency budget.</p>
+    <h2>One thing to do first</h2>
+    <p>Within 48 hours, run a licensed representative clip on the target hardware and record predeclared tracking, event-quality, latency and upload → event → evidence acceptance results.</p>
+    <div class="dissent-ledger"><strong>Dissent Ledger</strong><ul>
+      <li><strong>DISSENT PRESERVED:</strong> Precommit to a polished YOLO-plus-rules dashboard if Day-1 tracking fails — prevents the hybrid from collapsing into an unimpressive baseline; from the Prosecutor.</li>
+      <li><strong>DISSENT PRESERVED:</strong> Treat stable Day-1 tracking as the dominant schedule assumption — temporal differentiation is explicitly contingent on early feasibility; from Chairman-Dissent.</li>
+      <li><strong>DISSENT PRESERVED:</strong> Pair replay with a live test — avoids masking weak live reliability; from the Prosecutor.</li>
+      <li><strong>DISSENT PRESERVED:</strong> Define retention/deletion, model and footage licensing, safe claims and ground-truth ownership — converts vague compliance into demo obligations; from Chairman-Dissent.</li>
+    </ul><div class="note"><strong>Chairman difference:</strong> Dissent supports the hybrid only narrowly and requires an explicit Day-1 fallback; Consensus adopts the hybrid more directly.</div></div>
+  </div></div>
+
+  <div class="card"><div class="card-title">Agreement grid</div><div class="card-body"><table>
+    <thead><tr><th>Position</th><th class="center">Red</th><th class="center">First</th><th class="center">Expand</th><th class="center">Outside</th><th class="center">Execute</th></tr></thead>
+    <tbody>
+      <tr><td>Stage-gated hybrid</td><td class="center">●</td><td class="center">●</td><td class="center">●</td><td class="center">●</td><td class="center">●</td></tr>
+      <tr><td>Day-2 working baseline</td><td class="center">●</td><td class="center">●</td><td class="center">○</td><td class="center">●</td><td class="center">●</td></tr>
+      <tr><td>Hero behavior / narrow scope</td><td class="center">●</td><td class="center">●</td><td class="center">●</td><td class="center">●</td><td class="center">●</td></tr>
+      <tr><td>Selective verification only</td><td class="center">●</td><td class="center">●</td><td class="center">●</td><td class="center">●</td><td class="center">●</td></tr>
+      <tr><td>Replay fallback, clearly labeled</td><td class="center">○</td><td class="center">○</td><td class="center">●</td><td class="center">●</td><td class="center">●</td></tr>
+    </tbody>
+  </table></div></div>
+
+  <div class="card"><div class="card-title">RICE Analysis</div><div class="card-body"><table>
+    <thead><tr><th>Option</th><th>Reach</th><th>Impact</th><th>Confidence</th><th>Effort</th><th>Score</th></tr></thead>
+    <tbody>
+      <tr><td>Full revised architecture</td><td>XL</td><td>H</td><td>40%</td><td>7.0 person-weeks</td><td class="score">0.46</td></tr>
+      <tr><td>YOLO-plus-rules</td><td>L</td><td>M</td><td>90%</td><td>2.0</td><td class="score">1.35</td></tr>
+      <tr><td>Stage-gated hybrid</td><td>XL</td><td>H</td><td>75%</td><td>3.5</td><td class="score">1.71</td></tr>
+      <tr><td>Proof-carrying hero behavior</td><td>L</td><td>H</td><td>85%</td><td>2.5</td><td class="score">2.04</td></tr>
+    </tbody>
+  </table><p style="margin-top:.6rem;font-size:.8rem;color:#666">Reviewers cautioned that these estimates are directional, not measured precision.</p></div></div>
+
+  <div class="card"><div class="card-title">Debate Round</div><div class="card-body"><div class="debate-callout">
+    <div class="debate-side prosecutor"><strong>Prosecutor</strong>The hero hybrid may still hide a distributed integration project. If tracking fails, its own gates remove the differentiators and leave a narrow baseline, while a broad simple dashboard might demo better. Replay can reduce credibility. The decisive signal is Day-1 ID-switch rate on licensed representative footage.</div>
+    <div class="debate-side defender"><strong>Defender</strong>The risk is real, but supports stage-gating. Implement one process with append-only records rather than services; make traces, versions and manifests fields, not platforms. If tracking misses its gate, pivot cleanly. Surface evidence visibly and label replay. Measure tracking, event precision/recall and p95 latency before expansion.</div>
+  </div></div></div>
+
+  <div class="card"><div class="card-title">Advisor Responses</div><div class="card-body">
+    <details><summary>Red Team <span class="conf-high">high</span></summary><div class="detail-body">Premortem: the full system fails because tracking fragments, calibration varies, verification lags and thresholds remain untuned. Root cause is committing to the full architecture without a mandatory baseline. Cut scope if upload → event → evidence is not deterministic by Day 2. Use derived temporal features, not a general graph; keep simple SQLite and only measured two-pass verification.</div></details>
+    <details><summary>First Principles <span class="conf-high">high</span></summary><div class="detail-body">Allocate by failure containment. Establish a baseline by Day 2, add verification behind removable interfaces and freeze scope after Day 3. The irreducible product is repeatable ingestion, event detection, time-linked explanation and reproducibility. Selective verification, traces, policies and manifests are the highest-leverage additions.</div></details>
+    <details><summary>Expansionist <span class="conf-high">high</span></summary><div class="detail-body">The dominant outside option is a proof-carrying hero behavior paired with a replay-first temporal lab. One deeply evaluated temporal behavior preserves differentiation while ordinary SQLite records avoid a generalized graph. Make the assistant optional and center visible evidence.</div></details>
+    <details><summary>Outsider <span class="conf-high">high</span></summary><div class="detail-body">Using experimental flight-test logic, freeze a Day-2 taxi-test baseline, then admit histories, verification, manifests and evaluation one gate at a time. General abstractions are mostly invisible to judges. Preserve abort modes and reduce to two behaviors with three curated scenarios.</div></details>
+    <details><summary>Executor <span class="conf-high">high</span></summary><div class="detail-body">Orient for only half a day, then decide. The hero-slice hybrid ranks above both full and basic options. Unknown hardware throughput, licensed footage and ground-truth criteria block a final scope. Keep validation, histories, verification, risk, evidence/traces and tests; simplify or cut everything else.</div></details>
+  </div></div>
+
+  <div class="card"><div class="card-title">Peer Reviews</div><div class="card-body">
+    <details><summary>Reviewer 1 — consensus 5/5</summary><div class="detail-body">Strongest: Outsider, for operational stage gates and fallback. Weakness: gates have no measurable thresholds. Collective miss: concrete audit-day protocol.</div></details>
+    <details><summary>Reviewer 2 — consensus 5/5</summary><div class="detail-body">Strongest: Executor, for separating critical path from deferrable work. Weakness: unsupported numerical scoring. Collective miss: security, license, failure-mode and reproducibility audit.</div></details>
+    <details><summary>Reviewer 3 — consensus 5/5</summary><div class="detail-body">Strongest: Executor, for the sharp hero-slice decision. Weakness: pseudo-precision and missing gates. Collective miss: clean-room and rollback verification on Day 6.</div></details>
+    <details><summary>Reviewer 4 — consensus 5/5</summary><div class="detail-body">Strongest: Outsider, for reversible flight-test gates. Weakness: Day-2 baseline may itself anchor decisions. Collective miss: footage, ground truth and quantitative thresholds.</div></details>
+    <details><summary>Reviewer 5 — consensus 4/5</summary><div class="detail-body">Strongest: Executor. Weakness: no quantitative gate and replay may hide live weakness. Collective miss: representative test set and target-hardware acceptance contract.</div></details>
+  </div></div>
+
+  <footer>LLM Council &middot; Mode: Standard &middot; SHA: dc47c28e &middot; <a href="council-transcript-20260902-234246Z-qdc47c28e.md">Full transcript</a></footer>
+</div>
+</body>
+</html>
