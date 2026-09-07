@@ -35,6 +35,11 @@ if (-not (Test-Path $storageRoot)) {
     Write-Host "[OK] Created storage root: $storageRoot" -ForegroundColor Green
 }
 
+# Run database migrations and seed default camera
+Write-Host "`nEnsuring database tables and camera profiles are initialized..." -ForegroundColor Yellow
+alembic -c backend/alembic.ini upgrade head
+python -m warehouse_ai.cli seed-camera
+
 Write-Host "`nStarting API Server (port $ApiPort)..." -ForegroundColor Yellow
 $apiJob = Start-Process -FilePath "python" -ArgumentList "-m uvicorn warehouse_ai.api.app:app --host 127.0.0.1 --port $ApiPort" -PassThru -NoNewWindow
 
@@ -42,7 +47,7 @@ Write-Host "Starting Background Worker..." -ForegroundColor Yellow
 $workerJob = Start-Process -FilePath "python" -ArgumentList "-m warehouse_ai.worker.main" -PassThru -NoNewWindow
 
 Write-Host "Starting Next.js Web App (port $WebPort)..." -ForegroundColor Yellow
-$webJob = Start-Process -FilePath "pnpm" -ArgumentList "--dir apps/web dev -p $WebPort" -PassThru -NoNewWindow
+$webJob = Start-Process -FilePath "cmd.exe" -ArgumentList "/c pnpm --dir apps/web dev -p $WebPort" -PassThru -NoNewWindow
 
 Write-Host "`nAll services launched successfully!" -ForegroundColor Green
 Write-Host "Web UI:     http://localhost:$WebPort" -ForegroundColor Cyan
