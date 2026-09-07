@@ -35,7 +35,10 @@ htmlcov/
 
 # Storage & Runtime artifacts (Section 6 & 8.1)
 storage/
+data/storage/
 *.mp4
+!data/video/
+!data/video/**
 *.pt
 models/*.pt
 
