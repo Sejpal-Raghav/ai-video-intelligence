@@ -1,0 +1,17 @@
+schema_version: risk-policy.v1
+bases:
+  DROP: 45
+  FORCEFUL_RELEASE: 55
+  DRAGGING: 40
+  VISIBLE_SUPPORT_OVERHANG: 35
+  PROHIBITED_ZONE: 50
+  STANDING_ON_PRODUCT: 45
+tiers:
+  LOW: [0, 39]
+  MEDIUM: [40, 59]
+  HIGH: [60, 79]
+  CRITICAL: [80, 100]
+zone_bonus:
+  NORMAL: 0
+  SENSITIVE: 10
+  CRITICAL: 20

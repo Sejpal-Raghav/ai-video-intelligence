@@ -1,0 +1,53 @@
+{
+  "schema_version": "dataset-splits.v1",
+  "scenarios": [
+    "S01_CONTROLLED_PLACE",
+    "S02_LOW_DROP",
+    "S03_HIGH_DROP",
+    "S04_LATERAL_THROW",
+    "S05_SUPPORTED_TRANSPORT",
+    "S06_SHORT_DRAG",
+    "S07_PROLONGED_DRAG",
+    "S08_CORRECT_PALLET_PLACE",
+    "S09_PALLET_OVERHANG",
+    "S10_PROHIBITED_ZONE"
+  ],
+  "partitions": {
+    "train_take_a": [
+      {"clip_id": "S01_take_a", "scenario": "S01_CONTROLLED_PLACE", "take": "A"},
+      {"clip_id": "S02_take_a", "scenario": "S02_LOW_DROP", "take": "A"},
+      {"clip_id": "S03_take_a", "scenario": "S03_HIGH_DROP", "take": "A"},
+      {"clip_id": "S04_take_a", "scenario": "S04_LATERAL_THROW", "take": "A"},
+      {"clip_id": "S05_take_a", "scenario": "S05_SUPPORTED_TRANSPORT", "take": "A"},
+      {"clip_id": "S06_take_a", "scenario": "S06_SHORT_DRAG", "take": "A"},
+      {"clip_id": "S07_take_a", "scenario": "S07_PROLONGED_DRAG", "take": "A"},
+      {"clip_id": "S08_take_a", "scenario": "S08_CORRECT_PALLET_PLACE", "take": "A"},
+      {"clip_id": "S09_take_a", "scenario": "S09_PALLET_OVERHANG", "take": "A"},
+      {"clip_id": "S10_take_a", "scenario": "S10_PROHIBITED_ZONE", "take": "A"}
+    ],
+    "development_take_b": [
+      {"clip_id": "S01_take_b", "scenario": "S01_CONTROLLED_PLACE", "take": "B"},
+      {"clip_id": "S02_take_b", "scenario": "S02_LOW_DROP", "take": "B"},
+      {"clip_id": "S03_take_b", "scenario": "S03_HIGH_DROP", "take": "B"},
+      {"clip_id": "S04_take_b", "scenario": "S04_LATERAL_THROW", "take": "B"},
+      {"clip_id": "S05_take_b", "scenario": "S05_SUPPORTED_TRANSPORT", "take": "B"},
+      {"clip_id": "S06_take_b", "scenario": "S06_SHORT_DRAG", "take": "B"},
+      {"clip_id": "S07_take_b", "scenario": "S07_PROLONGED_DRAG", "take": "B"},
+      {"clip_id": "S08_take_b", "scenario": "S08_CORRECT_PALLET_PLACE", "take": "B"},
+      {"clip_id": "S09_take_b", "scenario": "S09_PALLET_OVERHANG", "take": "B"},
+      {"clip_id": "S10_take_b", "scenario": "S10_PROHIBITED_ZONE", "take": "B"}
+    ],
+    "holdout_take_c": [
+      {"clip_id": "S01_take_c", "scenario": "S01_CONTROLLED_PLACE", "take": "C"},
+      {"clip_id": "S02_take_c", "scenario": "S02_LOW_DROP", "take": "C"},
+      {"clip_id": "S03_take_c", "scenario": "S03_HIGH_DROP", "take": "C"},
+      {"clip_id": "S04_take_c", "scenario": "S04_LATERAL_THROW", "take": "C"},
+      {"clip_id": "S05_take_c", "scenario": "S05_SUPPORTED_TRANSPORT", "take": "C"},
+      {"clip_id": "S06_take_c", "scenario": "S06_SHORT_DRAG", "take": "C"},
+      {"clip_id": "S07_take_c", "scenario": "S07_PROLONGED_DRAG", "take": "C"},
+      {"clip_id": "S08_take_c", "scenario": "S08_CORRECT_PALLET_PLACE", "take": "C"},
+      {"clip_id": "S09_take_c", "scenario": "S09_PALLET_OVERHANG", "take": "C"},
+      {"clip_id": "S10_take_c", "scenario": "S10_PROHIBITED_ZONE", "take": "C"}
+    ]
+  }
+}

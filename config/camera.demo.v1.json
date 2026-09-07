@@ -1,0 +1,51 @@
+{
+  "schema_version": "camera-profile.v1",
+  "id": "demo-camera",
+  "name": "Demo fixed camera",
+  "camera_motion": "FIXED",
+  "frame_aspect_ratio": 1.777778,
+  "floor_polygon": [
+    [0.02, 0.55],
+    [0.98, 0.55],
+    [0.98, 0.98],
+    [0.02, 0.98]
+  ],
+  "zones": [
+    {
+      "id": "loading",
+      "kind": "ALLOWED",
+      "severity": "NORMAL",
+      "polygon": [
+        [0.05, 0.60],
+        [0.60, 0.60],
+        [0.60, 0.95],
+        [0.05, 0.95]
+      ]
+    },
+    {
+      "id": "edge",
+      "kind": "PROHIBITED",
+      "severity": "CRITICAL",
+      "polygon": [
+        [0.75, 0.55],
+        [0.98, 0.55],
+        [0.98, 0.98],
+        [0.75, 0.98]
+      ]
+    }
+  ],
+  "support_regions": [
+    {
+      "id": "pallet-a-visible-top",
+      "label": "Visible pallet A top",
+      "polygon": [
+        [0.18, 0.62],
+        [0.53, 0.60],
+        [0.58, 0.83],
+        [0.16, 0.85]
+      ]
+    }
+  ],
+  "created_at": "2026-09-04T00:00:00Z",
+  "profile_sha256": "392c14450bfcfb0f35a6f6a5b412323da4a0f13f932db98543d3b5651caf8b68"
+}

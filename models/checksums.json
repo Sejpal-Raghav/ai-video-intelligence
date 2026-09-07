@@ -1,0 +1,18 @@
+{
+  "schema_version": "model-checksums.v1",
+  "models": {
+    "warehouse-v1": {
+      "backend": "ultralytics",
+      "architecture": "yolo26n",
+      "weights_file": "warehouse-v1.pt",
+      "weights_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "detector_config_sha256": "4b971a81dc19a12882c3c907ee94f923e4ea976722d7119ffda239cf2c01a2f1",
+      "class_map": {
+        "0": "person",
+        "1": "package",
+        "2": "pallet",
+        "3": "equipment"
+      }
+    }
+  }
+}
