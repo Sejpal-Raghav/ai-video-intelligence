@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from warehouse_ai.api.dependencies import get_db_session
 from warehouse_ai.api.errors import ProblemError
 from warehouse_ai.api.schemas import JobStatusResponse
-from warehouse_ai.repositories.jobs import get_job
+from warehouse_ai.repositories.jobs import get_job, get_job_by_run_id
 from warehouse_ai.repositories.runs import get_run
 
 router = APIRouter(prefix="/api/v1/jobs", tags=["jobs"])
@@ -20,7 +20,7 @@ def get_job_status(
     session: Session = Depends(get_db_session),
 ) -> JobStatusResponse:
     """Retrieve current background job progress and state."""
-    job = get_job(session, job_id)
+    job = get_job(session, job_id) or get_job_by_run_id(session, job_id)
     if not job:
         raise ProblemError(
             status_code=404,

@@ -64,9 +64,25 @@ def resolve_media_path(relative_path: str, storage_root: Path) -> Path:
 
 
 def get_media_asset(session: Session, media_id: str) -> MediaAssetModel | None:
-    """Fetch media asset row by ID."""
+    """Fetch media asset row by ID, or fallback to run_id (NORMALIZED) or video_id (SOURCE)."""
     stmt = select(MediaAssetModel).where(MediaAssetModel.id == media_id)
-    return session.execute(stmt).scalar_one_or_none()
+    asset = session.execute(stmt).scalar_one_or_none()
+    if asset:
+        return asset
+    # Fallback to run normalized video
+    stmt_run = select(MediaAssetModel).where(
+        MediaAssetModel.run_id == media_id,
+        MediaAssetModel.kind == "NORMALIZED",
+    )
+    asset = session.execute(stmt_run).scalar_one_or_none()
+    if asset:
+        return asset
+    # Fallback to video source
+    stmt_vid = select(MediaAssetModel).where(
+        MediaAssetModel.video_id == media_id,
+        MediaAssetModel.kind == "SOURCE",
+    )
+    return session.execute(stmt_vid).scalar_one_or_none()
 
 
 def insert_media_asset(session: Session, asset: MediaAssetModel) -> MediaAssetModel:
