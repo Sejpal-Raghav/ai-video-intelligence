@@ -40,12 +40,8 @@ def compute_smoothed_centers(
         for obs in observations
     ]
 
-    if n == 1:
+    if n <= 2:
         return raw_centers
-    if n == 2:
-        m_x = (raw_centers[0][0] + raw_centers[1][0]) / 2.0
-        m_y = (raw_centers[0][1] + raw_centers[1][1]) / 2.0
-        return [(m_x, m_y), (m_x, m_y)]
 
     smoothed: list[tuple[float, float]] = []
     # First observation: median of available 2 values
