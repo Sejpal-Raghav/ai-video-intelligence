@@ -1,0 +1,12 @@
+schema_version: detector-config.v1
+input_size: 960
+nms_iou: 0.50
+maximum_detections_per_frame: 100
+minimum_confidence:
+  person: 0.15
+  package: 0.10
+  pallet: 0.15
+  equipment: 0.15
+gpu_batch_size: 8
+cpu_batch_size: 1
+precision: fp32

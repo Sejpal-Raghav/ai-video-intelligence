@@ -1,0 +1,60 @@
+schema_version: behavior-rules.v1
+common:
+  minimum_non_interpolated_observations: 5
+  minimum_median_detection_confidence: 0.45
+  minimum_track_coverage: 0.80
+  maximum_interpolation_fraction: 0.20
+  maximum_boundary_fraction: 0.50
+  boundary_margin_norm: 0.005
+  maximum_interpolation_gap_ms: 200
+relationships:
+  near_package_diagonals: 1.50
+  co_moving_minimum_speed_hps: 0.15
+  co_moving_minimum_cosine: 0.70
+  co_moving_minimum_ms: 300
+  equipment_horizontal_overlap_ratio: 0.60
+  equipment_top_tolerance_package_h: 0.20
+  equipment_bottom_tolerance_package_h: 0.10
+  floor_person_bottom_tolerance_person_h: 0.10
+  visible_footprint_bottom_fraction: 0.15
+drop_forceful_release:
+  controlled_minimum_ms: 300
+  release_minimum_ms: 200
+  motion_window_ms: 700
+  drop_minimum_displacement_h: 0.50
+  drop_minimum_peak_down_speed_hps: 1.25
+  forceful_minimum_horizontal_displacement_w: 0.75
+  forceful_minimum_peak_horizontal_speed_hps: 1.50
+  impact_maximum_ms_after_motion: 1200
+  impact_minimum_pre_speed_hps: 1.25
+  impact_maximum_post_speed_hps: 0.35
+  impact_deceleration_window_ms: 300
+  settle_maximum_speed_hps: 0.25
+  settle_minimum_ms: 400
+  settle_timeout_ms: 1000
+  cooldown_ms: 2000
+dragging:
+  qualification_window_ms: 800
+  minimum_horizontal_displacement_w: 1.00
+  maximum_vertical_displacement_h: 0.25
+  minimum_direction_agreement: 0.70
+  direction_increment_deadband_w: 0.02
+  minimum_direction_increments: 3
+  active_minimum_horizontal_speed_hps: 0.20
+  end_inactivity_ms: 400
+  merge_gap_ms: 500
+placement:
+  stationary_maximum_speed_hps: 0.25
+  prohibited_zone_dwell_ms: 1000
+  prohibited_zone_exit_ms: 500
+  minimum_visible_support_ratio: 0.80
+  visible_support_dwell_ms: 500
+  visible_support_exit_ms: 500
+standing_on_product:
+  enabled: false
+  minimum_ankle_confidence: 0.50
+  package_box_expansion_fraction: 0.05
+  package_maximum_speed_hps: 0.25
+  dwell_ms: 1000
+  end_hysteresis_ms: 300
+  merge_gap_ms: 500

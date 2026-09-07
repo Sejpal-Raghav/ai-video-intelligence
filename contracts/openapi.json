@@ -1,0 +1,1853 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Warehouse AI Video Intelligence API",
+    "description": "Warehouse handling video intelligence API prototype",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/healthz": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Healthz",
+        "description": "Process liveness endpoint.",
+        "operationId": "healthz_healthz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Healthz Healthz Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/readyz": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Readyz",
+        "description": "Readiness endpoint verifying database, writable storage, FFmpeg, and model path.",
+        "operationId": "readyz_readyz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Readyz Readyz Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/videos": {
+      "post": {
+        "tags": [
+          "videos"
+        ],
+        "summary": "Upload Video",
+        "description": "Validate and ingest uploaded MP4 video according to Blueprint Section 8.2.",
+        "operationId": "upload_video_api_v1_videos_post",
+        "parameters": [
+          {
+            "name": "content-length",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Content-Length"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_video_api_v1_videos_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/videos/{video_id}": {
+      "get": {
+        "tags": [
+          "videos"
+        ],
+        "summary": "Get Video By Id",
+        "description": "Retrieve video metadata by ID.",
+        "operationId": "get_video_by_id_api_v1_videos__video_id__get",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "videos"
+        ],
+        "summary": "Delete Video By Id",
+        "description": "Cascade delete video and all related runs, assets, and storage files.",
+        "operationId": "delete_video_by_id_api_v1_videos__video_id__delete",
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/camera-profiles": {
+      "get": {
+        "tags": [
+          "camera-profiles"
+        ],
+        "summary": "Get Camera Profiles",
+        "description": "List all camera profiles returning the latest version for each distinct ID.",
+        "operationId": "get_camera_profiles_api_v1_camera_profiles_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CameraProfileResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Get Camera Profiles Api V1 Camera Profiles Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "camera-profiles"
+        ],
+        "summary": "Post Camera Profile",
+        "description": "Create an immutable camera profile version (MAX(version) + 1).",
+        "operationId": "post_camera_profile_api_v1_camera_profiles_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CameraProfileCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CameraProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/runs": {
+      "post": {
+        "tags": [
+          "runs"
+        ],
+        "summary": "Create Run",
+        "description": "Atomically enqueue analysis run and background job.",
+        "operationId": "create_run_api_v1_runs_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunAccepted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "runs"
+        ],
+        "summary": "Get Runs",
+        "description": "List runs ordered by creation date descending.",
+        "operationId": "get_runs_api_v1_runs_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "video_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RunDetail"
+                  },
+                  "title": "Response Get Runs Api V1 Runs Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/runs/{run_id}": {
+      "get": {
+        "tags": [
+          "runs"
+        ],
+        "summary": "Get Run By Id",
+        "description": "Retrieve run details by ID.",
+        "operationId": "get_run_by_id_api_v1_runs__run_id__get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Get Job Status",
+        "description": "Retrieve current background job progress and state.",
+        "operationId": "get_job_status_api_v1_jobs__job_id__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/events": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Get Events",
+        "description": "List events matching filters with cursor pagination.",
+        "operationId": "get_events_api_v1_events_get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "event_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Event Type"
+            }
+          },
+          {
+            "name": "risk_tier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Risk Tier"
+            }
+          },
+          {
+            "name": "review_verdict",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Review Verdict"
+            }
+          },
+          {
+            "name": "start_ms",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start Ms"
+            }
+          },
+          {
+            "name": "end_ms",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End Ms"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/events/{event_id}": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Get Event By Id",
+        "description": "Retrieve event details, facts, trace, and media links by ID.",
+        "operationId": "get_event_by_id_api_v1_events__event_id__get",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/events/{event_id}/reviews": {
+      "post": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Post Event Review",
+        "description": "Append a human review revision for an event.",
+        "operationId": "post_event_review_api_v1_events__event_id__reviews_post",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/{media_id}": {
+      "head": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Stream Media",
+        "description": "Stream authorized media asset supporting RFC 7233 byte ranges.",
+        "operationId": "stream_media_api_v1_media__media_id__head",
+        "parameters": [
+          {
+            "name": "media_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Media Id"
+            }
+          },
+          {
+            "name": "range",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Range"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Stream Media",
+        "description": "Stream authorized media asset supporting RFC 7233 byte ranges.",
+        "operationId": "stream_media_api_v1_media__media_id__get",
+        "parameters": [
+          {
+            "name": "media_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Media Id"
+            }
+          },
+          {
+            "name": "range",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Range"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/summary": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Summary",
+        "description": "Deterministic analytics summary for up to 20 run_ids or video_ids.",
+        "operationId": "get_summary_api_v1_analytics_summary_get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "video_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Video Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnalyticsScope": {
+        "properties": {
+          "run_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Run Ids"
+          },
+          "video_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Video Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "run_ids",
+          "video_ids"
+        ],
+        "title": "AnalyticsScope"
+      },
+      "AnalyticsSummary": {
+        "properties": {
+          "scope": {
+            "$ref": "#/components/schemas/AnalyticsScope"
+          },
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
+          },
+          "reviewed_count": {
+            "type": "integer",
+            "title": "Reviewed Count"
+          },
+          "by_event_type": {
+            "items": {
+              "$ref": "#/components/schemas/CountItem"
+            },
+            "type": "array",
+            "title": "By Event Type"
+          },
+          "by_risk_tier": {
+            "items": {
+              "$ref": "#/components/schemas/CountItem"
+            },
+            "type": "array",
+            "title": "By Risk Tier"
+          },
+          "by_review_verdict": {
+            "items": {
+              "$ref": "#/components/schemas/CountItem"
+            },
+            "type": "array",
+            "title": "By Review Verdict"
+          },
+          "total_source_duration_ms": {
+            "type": "integer",
+            "title": "Total Source Duration Ms"
+          },
+          "false_alert_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "False Alert Rate"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scope",
+          "event_count",
+          "reviewed_count",
+          "by_event_type",
+          "by_risk_tier",
+          "by_review_verdict",
+          "total_source_duration_ms"
+        ],
+        "title": "AnalyticsSummary"
+      },
+      "Body_upload_video_api_v1_videos_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_video_api_v1_videos_post"
+      },
+      "CameraProfileCreate": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "frame_aspect_ratio": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Frame Aspect Ratio"
+          },
+          "floor_polygon": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Floor Polygon"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/ZoneSchema"
+            },
+            "type": "array",
+            "title": "Zones"
+          },
+          "support_regions": {
+            "items": {
+              "$ref": "#/components/schemas/SupportRegionSchema"
+            },
+            "type": "array",
+            "title": "Support Regions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "frame_aspect_ratio",
+          "floor_polygon",
+          "zones",
+          "support_regions"
+        ],
+        "title": "CameraProfileCreate"
+      },
+      "CameraProfileResponse": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "title": "Schema Version",
+            "default": "camera-profile.v1"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "camera_motion": {
+            "type": "string",
+            "const": "FIXED",
+            "title": "Camera Motion",
+            "default": "FIXED"
+          },
+          "frame_aspect_ratio": {
+            "type": "number",
+            "title": "Frame Aspect Ratio"
+          },
+          "floor_polygon": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Floor Polygon"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/ZoneSchema"
+            },
+            "type": "array",
+            "title": "Zones"
+          },
+          "support_regions": {
+            "items": {
+              "$ref": "#/components/schemas/SupportRegionSchema"
+            },
+            "type": "array",
+            "title": "Support Regions"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "version",
+          "name",
+          "frame_aspect_ratio",
+          "floor_polygon",
+          "zones",
+          "support_regions",
+          "created_at",
+          "sha256"
+        ],
+        "title": "CameraProfileResponse"
+      },
+      "CountItem": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "count"
+        ],
+        "title": "CountItem"
+      },
+      "EventDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          },
+          "event_type": {
+            "type": "string",
+            "enum": [
+              "DROP",
+              "FORCEFUL_RELEASE",
+              "DRAGGING",
+              "VISIBLE_SUPPORT_OVERHANG",
+              "PROHIBITED_ZONE",
+              "STANDING_ON_PRODUCT"
+            ],
+            "title": "Event Type"
+          },
+          "start_ms": {
+            "type": "integer",
+            "title": "Start Ms"
+          },
+          "end_ms": {
+            "type": "integer",
+            "title": "End Ms"
+          },
+          "primary_track_id": {
+            "type": "integer",
+            "title": "Primary Track Id"
+          },
+          "risk": {
+            "$ref": "#/components/schemas/RiskDetail"
+          },
+          "evidence_quality": {
+            "type": "number",
+            "title": "Evidence Quality"
+          },
+          "verification_status": {
+            "type": "string",
+            "enum": [
+              "NOT_RUN",
+              "PASSED",
+              "FAILED"
+            ],
+            "title": "Verification Status"
+          },
+          "facts": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Facts"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          },
+          "media": {
+            "$ref": "#/components/schemas/MediaLinks"
+          },
+          "review": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "run_id",
+          "event_type",
+          "start_ms",
+          "end_ms",
+          "primary_track_id",
+          "risk",
+          "evidence_quality",
+          "verification_status",
+          "facts",
+          "explanation",
+          "media"
+        ],
+        "title": "EventDetail"
+      },
+      "EventPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EventDetail"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "EventPage"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "JobStatusResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "QUEUED",
+              "RUNNING",
+              "SUCCEEDED",
+              "FAILED"
+            ],
+            "title": "State"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "QUEUED",
+              "NORMALIZING",
+              "DETECTING",
+              "VERIFYING",
+              "SCORING",
+              "WRITING_EVIDENCE",
+              "COMPLETE",
+              "FAILED"
+            ],
+            "title": "Stage"
+          },
+          "progress": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Progress"
+          },
+          "attempt": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Attempt"
+          },
+          "updated_at": {
+            "type": "string",
+            "title": "Updated At"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "run_id",
+          "state",
+          "stage",
+          "progress",
+          "attempt",
+          "updated_at"
+        ],
+        "title": "JobStatusResponse"
+      },
+      "MediaLinks": {
+        "properties": {
+          "clip_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clip Id"
+          },
+          "thumbnail_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "MediaLinks"
+      },
+      "ReviewCreate": {
+        "properties": {
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "CONFIRMED_RISK",
+              "REJECTED",
+              "UNCERTAIN"
+            ],
+            "title": "Verdict"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Note",
+            "default": ""
+          },
+          "reviewer_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Reviewer Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "verdict",
+          "reviewer_name"
+        ],
+        "title": "ReviewCreate"
+      },
+      "ReviewResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "CONFIRMED_RISK",
+              "REJECTED",
+              "UNCERTAIN"
+            ],
+            "title": "Verdict"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          },
+          "reviewer_name": {
+            "type": "string",
+            "title": "Reviewer Name"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "event_id",
+          "revision",
+          "verdict",
+          "note",
+          "reviewer_name",
+          "created_at"
+        ],
+        "title": "ReviewResponse"
+      },
+      "RiskDetail": {
+        "properties": {
+          "score": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Score"
+          },
+          "tier": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "title": "Tier"
+          },
+          "policy_version": {
+            "type": "string",
+            "title": "Policy Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "score",
+          "tier",
+          "policy_version"
+        ],
+        "title": "RiskDetail"
+      },
+      "RunAccepted": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "title": "Run Id"
+          },
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          },
+          "status": {
+            "type": "string",
+            "const": "QUEUED",
+            "title": "Status",
+            "default": "QUEUED"
+          },
+          "status_url": {
+            "type": "string",
+            "title": "Status Url"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "run_id",
+          "job_id",
+          "status_url"
+        ],
+        "title": "RunAccepted"
+      },
+      "RunCreate": {
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "camera_profile_id": {
+            "type": "string",
+            "title": "Camera Profile Id"
+          },
+          "camera_profile_version": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Camera Profile Version"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "LIVE",
+              "REPLAY"
+            ],
+            "title": "Mode",
+            "default": "LIVE"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "video_id",
+          "camera_profile_id",
+          "camera_profile_version"
+        ],
+        "title": "RunCreate"
+      },
+      "RunDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "video_id": {
+            "type": "string",
+            "title": "Video Id"
+          },
+          "camera_profile_id": {
+            "type": "string",
+            "title": "Camera Profile Id"
+          },
+          "camera_profile_version": {
+            "type": "integer",
+            "title": "Camera Profile Version"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "LIVE",
+              "REPLAY"
+            ],
+            "title": "Mode"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "QUEUED",
+              "RUNNING",
+              "SUCCEEDED",
+              "FAILED"
+            ],
+            "title": "Status"
+          },
+          "model_backend": {
+            "type": "string",
+            "title": "Model Backend"
+          },
+          "rules_version": {
+            "type": "string",
+            "title": "Rules Version"
+          },
+          "risk_policy_version": {
+            "type": "string",
+            "title": "Risk Policy Version"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "manifest_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manifest Url"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "video_id",
+          "camera_profile_id",
+          "camera_profile_version",
+          "mode",
+          "status",
+          "model_backend",
+          "rules_version",
+          "risk_policy_version",
+          "warnings",
+          "created_at"
+        ],
+        "title": "RunDetail"
+      },
+      "SupportRegionSchema": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "polygon": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Polygon"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "polygon"
+        ],
+        "title": "SupportRegionSchema"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VideoResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "original_name": {
+            "type": "string",
+            "title": "Original Name"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "duration_ms": {
+            "type": "integer",
+            "title": "Duration Ms"
+          },
+          "width": {
+            "type": "integer",
+            "title": "Width"
+          },
+          "height": {
+            "type": "integer",
+            "title": "Height"
+          },
+          "fps": {
+            "type": "number",
+            "title": "Fps"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "expires_at": {
+            "type": "string",
+            "title": "Expires At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "original_name",
+          "sha256",
+          "size_bytes",
+          "duration_ms",
+          "width",
+          "height",
+          "fps",
+          "created_at",
+          "expires_at"
+        ],
+        "title": "VideoResponse"
+      },
+      "ZoneSchema": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "ALLOWED",
+              "PROHIBITED"
+            ],
+            "title": "Kind"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "NORMAL",
+              "CRITICAL"
+            ],
+            "title": "Severity"
+          },
+          "polygon": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Polygon"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "severity",
+          "polygon"
+        ],
+        "title": "ZoneSchema"
+      }
+    }
+  }
+}

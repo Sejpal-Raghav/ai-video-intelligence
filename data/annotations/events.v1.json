@@ -1,0 +1,127 @@
+{
+  "schema_version": "event-annotations.v1",
+  "clips": [
+    {
+      "clip_id": "S01_take_a",
+      "video_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scenario_id": "S01_CONTROLLED_PLACE",
+      "expected_events": [],
+      "annotator": "member-3",
+      "adjudicator": "member-1"
+    },
+    {
+      "clip_id": "S02_take_a",
+      "video_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b856",
+      "scenario_id": "S02_LOW_DROP",
+      "expected_events": [
+        {
+          "event_type": "DROP",
+          "start_ms": 1500,
+          "end_ms": 2600
+        }
+      ],
+      "annotator": "member-3",
+      "adjudicator": "member-1"
+    },
+    {
+      "clip_id": "S03_take_a",
+      "video_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b857",
+      "scenario_id": "S03_HIGH_DROP",
+      "expected_events": [
+        {
+          "event_type": "DROP",
+          "start_ms": 2000,
+          "end_ms": 3400
+        }
+      ],
+      "annotator": "member-3",
+      "adjudicator": "member-1"
+    },
+    {
+      "clip_id": "S04_take_a",
+      "video_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b858",
+      "scenario_id": "S04_LATERAL_THROW",
+      "expected_events": [
+        {
+          "event_type": "FORCEFUL_RELEASE",
+          "start_ms": 4500,
+          "end_ms": 6500
+        }
+      ],
+      "annotator": "member-3",
+      "adjudicator": "member-1"
+    },
+    {
+      "clip_id": "S05_take_a",
+      "video_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b859",
+      "scenario_id": "S05_SUPPORTED_TRANSPORT",
+      "expected_events": [],
+      "annotator": "member-3",
+      "adjudicator": "member-1"
+    },
+    {
+      "clip_id": "S06_take_a",
+      "video_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85a",
+      "scenario_id": "S06_SHORT_DRAG",
+      "expected_events": [
+        {
+          "event_type": "DRAGGING",
+          "start_ms": 1800,
+          "end_ms": 3200
+        }
+      ],
+      "annotator": "member-3",
+      "adjudicator": "member-1"
+    },
+    {
+      "clip_id": "S07_take_a",
+      "video_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85b",
+      "scenario_id": "S07_PROLONGED_DRAG",
+      "expected_events": [
+        {
+          "event_type": "DRAGGING",
+          "start_ms": 1200,
+          "end_ms": 4500
+        }
+      ],
+      "annotator": "member-3",
+      "adjudicator": "member-1"
+    },
+    {
+      "clip_id": "S08_take_a",
+      "video_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85c",
+      "scenario_id": "S08_CORRECT_PALLET_PLACE",
+      "expected_events": [],
+      "annotator": "member-3",
+      "adjudicator": "member-1"
+    },
+    {
+      "clip_id": "S09_take_a",
+      "video_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85d",
+      "scenario_id": "S09_PALLET_OVERHANG",
+      "expected_events": [
+        {
+          "event_type": "VISIBLE_SUPPORT_OVERHANG",
+          "start_ms": 2500,
+          "end_ms": 4800
+        }
+      ],
+      "annotator": "member-3",
+      "adjudicator": "member-1"
+    },
+    {
+      "clip_id": "S10_take_a",
+      "video_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85e",
+      "scenario_id": "S10_PROHIBITED_ZONE",
+      "expected_events": [
+        {
+          "event_type": "PROHIBITED_ZONE",
+          "start_ms": 2000,
+          "end_ms": 4200
+        }
+      ],
+      "annotator": "member-3",
+      "adjudicator": "member-1"
+    }
+  ]
+}
