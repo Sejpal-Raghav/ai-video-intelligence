@@ -8,7 +8,10 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "list",
   use: {
-    baseURL: process.env.BASE_URL || "http://localhost:3000",
+    // 127.0.0.1, not localhost: the backend's CORS (WEB_ORIGIN in .env) is
+    // locked to an exact origin, and 127.0.0.1/localhost are different
+    // origins to the browser even though they resolve to the same host.
+    baseURL: process.env.BASE_URL || "http://127.0.0.1:3000",
     trace: "on-first-retry",
   },
   projects: [

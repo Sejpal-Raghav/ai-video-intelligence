@@ -12,7 +12,29 @@
         "1": "package",
         "2": "pallet",
         "3": "equipment"
-      }
+      },
+      "status": "NOT_TRAINED — weights_sha256 above is the SHA-256 of an empty file, i.e. this model does not exist yet. This entry describes the target architecture only."
+    },
+    "yolo11n-coco-fallback": {
+      "backend": "ultralytics",
+      "architecture": "yolo11n",
+      "weights_file": "yolo11n.pt (auto-downloaded by Ultralytics; not committed, see .gitignore *.pt)",
+      "weights_sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1",
+      "class_map": {
+        "0": "person",
+        "24": "package (backpack proxy)",
+        "26": "package (handbag proxy)",
+        "28": "package (suitcase proxy)",
+        "56": "package (chair proxy)",
+        "57": "package (couch proxy)",
+        "59": "package (bed proxy)",
+        "60": "package (dining table proxy)",
+        "62": "package (tv proxy)",
+        "63": "package (laptop proxy)",
+        "67": "package (cell phone proxy)",
+        "73": "package (book proxy)"
+      },
+      "status": "ACTUAL FALLBACK IN USE when warehouse-v1.pt is absent (see vision/factory.py::build_detector_tracker). Stock COCO-pretrained weights used as a package proxy; validated end-to-end against all 7 videos in data/video/ — see docs/model_card.md Section 0 and vision/factory.py for the full validation notes and known limitations."
     }
   }
 }

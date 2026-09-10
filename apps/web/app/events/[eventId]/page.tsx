@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect, use, useRef } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -24,6 +24,7 @@ import { Alert } from "@/components/ui/Alert";
 import { Card } from "@/components/ui/Card";
 import { Badge, RiskBadge, VerdictBadge } from "@/components/ui/Badge";
 import { StateWrapper, AsyncState } from "@/components/ui/StateWrapper";
+import { BoxOverlay, TrackFrame } from "@/components/events/BoxOverlay";
 import type { components } from "@/lib/schema";
 
 type EventDetail = components["schemas"]["EventDetail"];
@@ -50,6 +51,10 @@ export default function EventDetailPage({ params }: EventPageProps) {
   const [event, setEvent] = useState<EventDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Track frames for bbox overlay
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [trackFrames, setTrackFrames] = useState<TrackFrame[]>([]);
 
   // Review Form State
   const [verdict, setVerdict] = useState<"CONFIRMED_RISK" | "REJECTED" | "UNCERTAIN">(
@@ -85,8 +90,22 @@ export default function EventDetailPage({ params }: EventPageProps) {
     }
   };
 
+  // Load pre-decoded track frames (bounding boxes) for the bbox overlay. The
+  // backend already reads and JSON-decodes tracks.jsonl.gz server-side, so no
+  // gzip/JSONL parsing library is needed on the client.
+  const fetchTrackFrames = async () => {
+    try {
+      const frames = await api.getEventTracks(eventId);
+      setTrackFrames(frames as unknown as TrackFrame[]);
+    } catch {
+      // Non-fatal: overlay just won't render (e.g. tracks not yet published)
+      setTrackFrames([]);
+    }
+  };
+
   useEffect(() => {
     fetchEvent();
+    fetchTrackFrames();
   }, [eventId]);
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
@@ -241,14 +260,20 @@ export default function EventDetailPage({ params }: EventPageProps) {
 
                 <div className="relative rounded-lg overflow-hidden bg-black border border-slate-800 aspect-video flex items-center justify-center">
                   {mediaClipUrl ? (
-                    <video
-                      controls
-                      playsInline
-                      className="w-full h-full object-contain"
-                      src={mediaClipUrl}
-                    >
-                      Your browser does not support HTML5 video streaming.
-                    </video>
+                    <>
+                      <video
+                        ref={videoRef}
+                        controls
+                        playsInline
+                        className="w-full h-full object-contain"
+                        src={mediaClipUrl}
+                      >
+                        Your browser does not support HTML5 video streaming.
+                      </video>
+                      {trackFrames.length > 0 && (
+                        <BoxOverlay trackFrames={trackFrames} videoRef={videoRef} />
+                      )}
+                    </>
                   ) : (
                     <div className="text-xs text-slate-500">Evidence clip not found</div>
                   )}

@@ -7,6 +7,28 @@
 
 ---
 
+## 0. Current Prototype Status (read this first)
+
+The `warehouse-v1` architecture below is the **target design**; the purpose-trained
+weights (`models/warehouse-v1.pt`) do not exist yet in this prototype
+(`models/checksums.json` records that fact explicitly). At runtime, `MODEL_BACKEND=ultralytics`
+falls back to a **stock, COCO-pretrained `yolo11n.pt`** (auto-downloaded by Ultralytics),
+with `person` (COCO id 0) used directly and a set of COCO classes used as
+**proxies** for `package` (backpack, handbag, suitcase, chair, couch, bed, dining
+table, tv, laptop, cell phone, book — see `vision/factory.py` for the exact
+map and the per-video validation data it's based on). `pallet` and `equipment`
+have no COCO proxy and are **never detected** under this fallback.
+
+This proxy detector was validated end-to-end against all 7 real videos in
+`data/video/`: 3 of 7 produce a real, non-trivial behavior event; the other 4
+(cupboards, KD-wrapped packets, generic cartons on a wet floor) do not map
+cleanly onto any stock COCO class and do not currently produce events. Closing
+that gap requires the purpose-trained 4-class detector this document
+otherwise describes — the rule/risk/evidence pipeline below is unchanged and
+would work identically once real `warehouse-v1.pt` weights are trained.
+
+---
+
 ## 1. Intended Use
 
 - **Primary Domain:** Fixed-camera warehouse package handling video analysis.

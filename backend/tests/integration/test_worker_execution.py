@@ -147,12 +147,93 @@ def test_worker_process_run_end_to_end(worker_context, monkeypatch):
 
     monkeypatch.setattr("warehouse_ai.worker.processor.normalize_video", fake_normalize)
 
-    # Process run
+    # Mock config loaders (avoid needing real YAML config files)
+    from warehouse_ai.domain.models import (
+        BehaviorRulesConfig, CommonRulesConfig, RelationshipRulesConfig,
+        DropForcefulReleaseRulesConfig, DraggingRulesConfig, PlacementRulesConfig,
+        StandingOnProductRulesConfig, RiskPolicyConfig,
+    )
+    from warehouse_ai.domain.models import CameraProfile
+
+    dummy_rules = BehaviorRulesConfig(
+        common=CommonRulesConfig(
+            minimum_non_interpolated_observations=1,
+            minimum_median_detection_confidence=0.1,
+            minimum_track_coverage=0.0,
+            maximum_interpolation_fraction=1.0,
+            maximum_boundary_fraction=1.0,
+            boundary_margin_norm=0.005,
+            maximum_interpolation_gap_ms=200,
+        ),
+        relationships=RelationshipRulesConfig(
+            near_package_diagonals=1.5,
+            co_moving_minimum_speed_hps=0.1,
+            co_moving_minimum_cosine=0.5,
+            co_moving_minimum_ms=100,
+            equipment_horizontal_overlap_ratio=0.5,
+            equipment_top_tolerance_package_h=0.2,
+            equipment_bottom_tolerance_package_h=0.1,
+            floor_person_bottom_tolerance_person_h=0.1,
+            visible_footprint_bottom_fraction=0.15,
+        ),
+        drop_forceful_release=DropForcefulReleaseRulesConfig(
+            controlled_minimum_ms=300, release_minimum_ms=200, motion_window_ms=700,
+            drop_minimum_displacement_h=0.5, drop_minimum_peak_down_speed_hps=1.25,
+            forceful_minimum_horizontal_displacement_w=0.75, forceful_minimum_peak_horizontal_speed_hps=1.5,
+            impact_maximum_ms_after_motion=1200, impact_minimum_pre_speed_hps=1.25,
+            impact_maximum_post_speed_hps=0.35, impact_deceleration_window_ms=300,
+            settle_maximum_speed_hps=0.25, settle_minimum_ms=400, settle_timeout_ms=1000, cooldown_ms=2000,
+        ),
+        dragging=DraggingRulesConfig(
+            qualification_window_ms=800, minimum_horizontal_displacement_w=1.0,
+            maximum_vertical_displacement_h=0.25, minimum_direction_agreement=0.7,
+            direction_increment_deadband_w=0.02, minimum_direction_increments=3,
+            active_minimum_horizontal_speed_hps=0.2, end_inactivity_ms=400, merge_gap_ms=500,
+        ),
+        placement=PlacementRulesConfig(
+            stationary_maximum_speed_hps=0.25, prohibited_zone_dwell_ms=1000,
+            prohibited_zone_exit_ms=500, minimum_visible_support_ratio=0.8,
+            visible_support_dwell_ms=500, visible_support_exit_ms=500,
+        ),
+        standing_on_product=StandingOnProductRulesConfig(
+            enabled=False, minimum_ankle_confidence=0.5, package_box_expansion_fraction=0.05,
+            package_maximum_speed_hps=0.25, dwell_ms=1000, end_hysteresis_ms=300, merge_gap_ms=500,
+        ),
+    )
+    dummy_risk_policy = RiskPolicyConfig(
+        bases={"DROP": 45, "FORCEFUL_RELEASE": 55, "DRAGGING": 40, "VISIBLE_SUPPORT_OVERHANG": 35, "PROHIBITED_ZONE": 50, "STANDING_ON_PRODUCT": 45},
+        tiers={"LOW": (0, 39), "MEDIUM": (40, 59), "HIGH": (60, 79), "CRITICAL": (80, 100)},
+        zone_bonus={"NORMAL": 0, "SENSITIVE": 10, "CRITICAL": 20},
+    )
+    dummy_camera = CameraProfile(
+        id="cam-work", name="Camera",
+        frame_aspect_ratio=1.778,
+        floor_polygon=[(0.0, 0.5), (1.0, 0.5), (1.0, 1.0), (0.0, 1.0)],
+        created_at="2026-09-04T00:00:00Z",
+    )
+
+    monkeypatch.setattr("warehouse_ai.worker.processor._load_behavior_rules", lambda: dummy_rules)
+    monkeypatch.setattr("warehouse_ai.worker.processor._load_risk_policy", lambda: dummy_risk_policy)
+    monkeypatch.setattr("warehouse_ai.worker.processor._load_camera_profile", lambda *a, **kw: dummy_camera)
+
+    # Use pipeline injection (the contract preserved in process_run) instead of
+    # monkeypatching decode_frames + build_detector_tracker separately.
+    # This is exactly the pattern the plan specifies tests should use.
+    from warehouse_ai.vision.pipeline import VisionPipeline, VisionPipelineResult
+    from typing import Any, Sequence
+
+    class FakeVisionPipeline:
+        """Returns empty results for integration test without real video."""
+        def run(self, frames: Any, expected_total_frames: Any = None) -> VisionPipelineResult:
+            return VisionPipelineResult()
+
+    # Process run with injected pipeline (exercises all other stages)
     process_run(
         session=session,
         job=job,
         worker_id="worker-test",
         settings=settings,
+        pipeline=FakeVisionPipeline(),  # type: ignore[arg-type]
     )
 
     # Verify atomic publication

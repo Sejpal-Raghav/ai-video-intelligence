@@ -91,7 +91,7 @@ class JobStatusResponse(BaseContractModel):
     progress: int = Field(ge=0, le=100)
     attempt: int = Field(ge=0)
     updated_at: str
-    error: dict[str, Any] | None = None
+    error: dict[str, Any] | None = Field(default=None, json_schema_extra={"additionalProperties": True})
 
 
 class RiskDetail(BaseContractModel):
@@ -138,8 +138,11 @@ class EventDetail(BaseContractModel):
     risk: RiskDetail
     evidence_quality: float
     verification_status: Literal["NOT_RUN", "PASSED", "FAILED"]
-    facts: dict[str, Any]
+    facts: dict[str, Any] = Field(json_schema_extra={"additionalProperties": True})
     explanation: str
+    decision_trace: dict[str, Any] | None = Field(
+        default=None, json_schema_extra={"additionalProperties": True}
+    )
     media: MediaLinks
     review: ReviewResponse | None = None
 

@@ -97,7 +97,43 @@ Open `http://localhost:3000` in your web browser.
 
 ---
 
-## 4. Running Offline Evaluation Benchmark
+## 4. Guaranteed-Working Demo Path (Replay Mode)
+
+The default `MODEL_BACKEND=ultralytics` path uses a stock COCO-pretrained
+detector as a package-class proxy (see `docs/model_card.md` Section 0 for
+why `warehouse-v1.pt` doesn't exist yet). That detector was validated
+against all 7 videos in `data/video/`; only some produce a qualifying event,
+and which ones can vary run to run since detection is not deterministic.
+
+If you need a **guaranteed, deterministic** demonstration of the full
+pipeline (detection → tracking → temporal reasoning → risk scoring →
+evidence clip → review workflow) — for example, right before a live demo —
+use the checked-in replay fixture instead:
+
+1. Set two environment variables before starting the worker (`scripts/dev.ps1`
+   reads `.env`; for a one-off demo run, set them in the same shell before
+   launching, or add them to `.env` temporarily and revert afterward):
+   ```powershell
+   $env:MODEL_BACKEND = "replay"
+   $env:REPLAY_TRACKS_PATH = "data\replay\throwing-mattresses.tracks.jsonl.gz"
+   ```
+2. Upload `data/replay/throwing-mattresses-demo-clip.mp4` through the normal
+   upload flow (Step 2 above).
+3. The run will deterministically produce **one `DROP` event, risk tier
+   `HIGH`, score 70**, with a real evidence clip and thumbnail cut from that
+   video — exactly as verified by
+   `backend/tests/integration/test_replay_fixture.py`.
+4. **Revert `MODEL_BACKEND` to `ultralytics`** (or unset it) afterward — this
+   fixture's track data is only valid for that specific clip; leaving
+   `MODEL_BACKEND=replay` set would silently apply the same canned tracks to
+   any other video you upload.
+
+See `data/replay/README.md` for exactly why the demo clip is trimmed to 2.5
+seconds and how the fixture was constructed.
+
+---
+
+## 5. Running Offline Evaluation Benchmark
 
 To verify detection precision, recall, and false-alert rates against ground truth:
 

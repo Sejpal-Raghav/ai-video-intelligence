@@ -54,13 +54,21 @@ def check_isobmff_ftyp_box(file_path: Path) -> bool:
 
 
 def run_ffprobe(ffprobe_path: str | Path, file_path: Path) -> dict:
-    """Execute ffprobe safely with -nostdin, shell=False, 15s timeout, captured stderr limited to 64 KiB."""
+    """Execute ffprobe safely, shell=False, 15s timeout, captured stderr limited to 64 KiB.
+
+    stdin is explicitly closed (DEVNULL) rather than passed via the -nostdin
+    CLI flag: some ffprobe builds (verified: ffmpeg 8.1.1 gyan.dev Windows
+    build) parse -nostdin as if it takes a value, consuming the next argument
+    (the file path) and failing with "Option not found" on every single
+    invocation. subprocess's stdin=DEVNULL gives the identical safety
+    property (ffprobe can never block waiting on stdin) without depending on
+    that CLI flag's parsing behaviour in a specific build.
+    """
     cmd = [
         str(ffprobe_path),
         "-v", "error",
         "-show_entries", "format=duration,format_name:stream=codec_type,codec_name,width,height,r_frame_rate,nb_frames",
         "-of", "json",
-        "-nostdin",
         str(file_path),
     ]
 
@@ -74,6 +82,7 @@ def run_ffprobe(ffprobe_path: str | Path, file_path: Path) -> dict:
     try:
         proc = subprocess.run(
             cmd,
+            stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=False,

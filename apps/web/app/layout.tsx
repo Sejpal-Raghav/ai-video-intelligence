@@ -3,6 +3,11 @@ import Link from "next/link";
 import { Activity, Camera, LayoutDashboard, ShieldAlert, Upload } from "lucide-react";
 import "./globals.css";
 
+// Same-origin resolution as lib/api.ts's API_BASE_URL: the backend does not
+// live on the Next.js origin, so this must be an absolute URL, not a
+// same-origin relative path (which would 404 against the Next.js server).
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
 export const metadata: Metadata = {
   title: "Warehouse AI Video Intelligence",
   description: "Automated warehouse handling video intelligence and risk event review.",
@@ -60,17 +65,22 @@ export default function RootLayout({
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/60 text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                API Connected
-              </div>
+              <a
+                href={`${API_BASE_URL}/healthz`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-xs font-mono px-2.5 py-1 rounded-full bg-slate-800/60 border border-slate-700/60 text-slate-400 hover:text-slate-200 hover:border-slate-500 transition-colors"
+              >
+                <Activity className="w-3 h-3" />
+                Health
+              </a>
             </div>
           </div>
         </header>
 
         {/* Mandatory Policy & Responsible-AI Banner per Section 16.2 */}
         <div className="bg-slate-900/90 border-b border-slate-800/60 py-1.5 px-4 text-center text-xs text-slate-400 tracking-wide flex items-center justify-center gap-4">
-          <span>⚠️ <strong>Policy Notice:</strong> Risk event, not confirmed damage.</span>
+          <span>⚠️ <strong>Responsible AI Policy:</strong> Risk event, not confirmed damage.</span>
           <span className="hidden sm:inline text-slate-600">|</span>
           <span className="hidden sm:inline">Evidence quality is a diagnostic metric, not probability.</span>
         </div>
@@ -81,7 +91,7 @@ export default function RootLayout({
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-600">
+        <footer className="border-t border-slate-800 bg-slate-950 py-6 text-center text-xs text-slate-600">
           Warehouse AI Video Intelligence Prototype &bull; Local Deterministic Verification Engine
         </footer>
       </body>
