@@ -63,13 +63,17 @@ def enqueue_run(
     job_id = str(uuid.uuid4())
     now_iso = datetime.now(timezone.utc).isoformat()
 
-    # Model metadata
+    # Model metadata: reflects whichever model vision/factory.py::build_detector_tracker
+    # will actually load — the purpose-trained warehouse-v1 weights if present,
+    # otherwise the yolo11n COCO-proxy fallback (see models/checksums.json).
     model_sha256 = "0" * 64
     checksums_file = settings.storage_root_path.parent / "models" / "checksums.json"
     if checksums_file.exists():
         try:
             chk = json.loads(checksums_file.read_text(encoding="utf-8"))
-            model_sha256 = chk.get("models/warehouse-v1.pt", "0" * 64)
+            models = chk.get("models", {})
+            entry_key = "warehouse-v1" if settings.model_file_path.exists() else "yolo11n-coco-fallback"
+            model_sha256 = models.get(entry_key, {}).get("weights_sha256", "0" * 64)
         except Exception:
             pass
 

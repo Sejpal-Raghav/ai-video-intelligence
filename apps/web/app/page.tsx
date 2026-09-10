@@ -61,10 +61,19 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [summaryData, runsData] = await Promise.all([
-        api.getAnalyticsSummary({}),
-        api.getRuns(10),
-      ]);
+      const runsData = await api.getRuns(10);
+      const summaryData = runsData.length
+        ? await api.getAnalyticsSummary({ run_id: runsData.map((run) => run.id) })
+        : {
+            scope: { run_ids: [], video_ids: [] },
+            event_count: 0,
+            reviewed_count: 0,
+            by_event_type: [],
+            by_risk_tier: [],
+            by_review_verdict: [],
+            total_source_duration_ms: 0,
+            false_alert_rate: null,
+          };
       setAnalytics(summaryData);
       setRecentRuns(runsData);
       setError(null);

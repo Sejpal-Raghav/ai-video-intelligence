@@ -46,7 +46,6 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
                   "type": "object",
                   "title": "Response Readyz Readyz Get"
                 }
@@ -660,6 +659,53 @@
         }
       }
     },
+    "/api/v1/events/{event_id}/tracks": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Get Event Tracks",
+        "description": "Return decoded track frames (bounding boxes) for the window around one event.\n\nReads the run's TRACKS media asset (tracks.jsonl.gz), filters to the event's\n[start_ms, end_ms] window padded by _TRACKS_WINDOW_PADDING_MS on each side\n(matching the evidence clip's own padding), and returns plain JSON so the\nfrontend bounding-box overlay can render without any gzip/JSONL parsing\nlibrary on the client.",
+        "operationId": "get_event_tracks_api_v1_events__event_id__tracks_get",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  },
+                  "title": "Response Get Event Tracks Api V1 Events  Event Id  Tracks Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/events/{event_id}/reviews": {
       "post": {
         "tags": [
@@ -992,7 +1038,7 @@
         "properties": {
           "file": {
             "type": "string",
-            "contentMediaType": "application/octet-stream",
+            "format": "binary",
             "title": "File"
           }
         },
@@ -1078,6 +1124,9 @@
           },
           "camera_motion": {
             "type": "string",
+            "enum": [
+              "FIXED"
+            ],
             "const": "FIXED",
             "title": "Camera Motion",
             "default": "FIXED"
@@ -1212,6 +1261,18 @@
             "type": "string",
             "title": "Explanation"
           },
+          "decision_trace": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "additionalProperties": true,
+            "title": "Decision Trace"
+          },
           "media": {
             "$ref": "#/components/schemas/MediaLinks"
           },
@@ -1337,13 +1398,13 @@
           "error": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
                 "type": "null"
               }
             ],
+            "additionalProperties": true,
             "title": "Error"
           }
         },
@@ -1514,6 +1575,9 @@
           },
           "status": {
             "type": "string",
+            "enum": [
+              "QUEUED"
+            ],
             "const": "QUEUED",
             "title": "Status",
             "default": "QUEUED"
@@ -1729,13 +1793,6 @@
           "type": {
             "type": "string",
             "title": "Error Type"
-          },
-          "input": {
-            "title": "Input"
-          },
-          "ctx": {
-            "type": "object",
-            "title": "Context"
           }
         },
         "type": "object",

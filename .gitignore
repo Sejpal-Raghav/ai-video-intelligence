@@ -39,6 +39,8 @@ data/storage/
 *.mp4
 !data/video/
 !data/video/**
+!data/replay/
+!data/replay/**
 *.pt
 models/*.pt
 

@@ -6,9 +6,25 @@ from warehouse_ai.domain.models import Frame, TrackedDetection
 
 
 class UltralyticsAdapter:
-    """Ultralytics YOLO + ByteTrack adapter isolated behind DetectorTracker protocol (Section 5.3)."""
+    """Ultralytics YOLO + ByteTrack adapter isolated behind DetectorTracker protocol (Section 5.3).
+
+    The class map is injectable so the factory can pass a COCO warehouse
+    allowlist.  Any COCO class id *not* present in the map is silently
+    dropped — this prevents cars/chairs/people-adjacent objects from being
+    mislabelled as ``package``.
+    """
 
     backend_name: str = "ultralytics"
+
+    # Default class map for a purpose-trained 4-class warehouse model.
+    # When using stock COCO weights the factory overrides this with the
+    # COCO warehouse allowlist (see vision/factory.py).
+    _DEFAULT_CLASS_MAP: dict[int, str] = {
+        0: "person",
+        1: "package",
+        2: "pallet",
+        3: "equipment",
+    }
 
     def __init__(
         self,
@@ -16,6 +32,7 @@ class UltralyticsAdapter:
         tracker_config_path: Path | str,
         device: str = "cpu",
         confidence_thresholds: dict[str, float] | None = None,
+        class_map: dict[int, str] | None = None,
     ) -> None:
         self.model_path = Path(model_path)
         self.tracker_config_path = Path(tracker_config_path)
@@ -26,9 +43,10 @@ class UltralyticsAdapter:
             "pallet": 0.15,
             "equipment": 0.15,
         }
+        # Injected class map takes precedence; fall back to default 4-class map.
+        self._class_map: dict[int, str] = class_map if class_map is not None else dict(self._DEFAULT_CLASS_MAP)
         self.model_sha256 = self._compute_model_hash()
         self._model: Any = None
-        self._class_map = {0: "person", 1: "package", 2: "pallet", 3: "equipment"}
 
     def _compute_model_hash(self) -> str:
         if not self.model_path.exists():
@@ -83,7 +101,13 @@ class UltralyticsAdapter:
                 track_id = int(box.id.item())
 
                 cls_idx = int(box.cls.item())
-                class_id = self._class_map.get(cls_idx, "package")
+
+                # STRICT allowlist: drop any class id not in the map.
+                # This prevents unlabelled COCO classes from becoming spurious
+                # "package" detections.
+                if cls_idx not in self._class_map:
+                    continue
+                class_id = self._class_map[cls_idx]
 
                 conf = float(box.conf.item())
                 min_conf = self.confidence_thresholds.get(class_id, 0.10)

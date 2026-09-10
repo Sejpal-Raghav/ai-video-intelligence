@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
+import gzip
 import json
 import uuid
-from typing import Literal
+from typing import Any, Literal
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from warehouse_ai.api.dependencies import get_db_session
+from warehouse_ai.api.dependencies import get_app_settings, get_db_session
 from warehouse_ai.api.errors import ProblemError
 from warehouse_ai.api.schemas import (
     EventDetail,
@@ -19,7 +20,13 @@ from warehouse_ai.api.schemas import (
     ReviewResponse,
     RiskDetail,
 )
+from warehouse_ai.config import Settings
 from warehouse_ai.repositories.events import InvalidCursorError, get_event, list_events
+from warehouse_ai.repositories.media import (
+    MediaNotFoundError,
+    PathTraversalError,
+    resolve_media_path,
+)
 from warehouse_ai.repositories.models import EventModel, MediaAssetModel
 from warehouse_ai.repositories.reviews import (
     ReviewConflictError,
@@ -28,6 +35,11 @@ from warehouse_ai.repositories.reviews import (
 )
 
 router = APIRouter(prefix="/api/v1/events", tags=["events"])
+
+# Padding applied around [start_ms, end_ms] when returning track frames for the
+# bounding-box overlay, matching the clip padding used in evidence/clips.py so
+# the overlay's time range always covers the full playable clip.
+_TRACKS_WINDOW_PADDING_MS = 1500
 
 
 def build_event_detail(session: Session, event: EventModel) -> EventDetail:
@@ -63,8 +75,24 @@ def build_event_detail(session: Session, event: EventModel) -> EventDetail:
             created_at=latest_rev.created_at,
         )
 
-    # Explanation text
-    explanation = f"Detected {event.event_type.replace('_', ' ').lower()} event from {event.start_ms / 1000.0:.1f}s to {event.end_ms / 1000.0:.1f}s (Track ID {event.primary_track_id})."
+    # Explanation: use the rich natural-language text computed by RiskEngine and stored in
+    # decision_trace_json, falling back to facts_json["explanation"], then to the generic stub.
+    try:
+        trace: dict[str, Any] = json.loads(event.decision_trace_json)
+        explanation: str = (
+            trace.get("explanation")
+            or facts.get("explanation")
+            or f"Detected {event.event_type.replace('_', ' ').lower()} event "
+               f"from {event.start_ms / 1000.0:.1f}s to {event.end_ms / 1000.0:.1f}s "
+               f"(Track ID {event.primary_track_id})."
+        )
+    except Exception:
+        trace = {}
+        explanation = (
+            f"Detected {event.event_type.replace('_', ' ').lower()} event "
+            f"from {event.start_ms / 1000.0:.1f}s to {event.end_ms / 1000.0:.1f}s "
+            f"(Track ID {event.primary_track_id})."
+        )
 
     return EventDetail(
         id=event.id,
@@ -82,6 +110,7 @@ def build_event_detail(session: Session, event: EventModel) -> EventDetail:
         verification_status=event.verification_status,  # type: ignore
         facts=facts,
         explanation=explanation,
+        decision_trace=trace or None,
         media=MediaLinks(clip_id=clip_id, thumbnail_id=thumb_id),
         review=review_dto,
     )
@@ -147,6 +176,72 @@ def get_event_by_id(
         )
 
     return build_event_detail(session, event)
+
+
+@router.get("/{event_id}/tracks", response_model=list[dict[str, Any]])
+def get_event_tracks(
+    event_id: str,
+    session: Session = Depends(get_db_session),
+    settings: Settings = Depends(get_app_settings),
+) -> list[dict[str, Any]]:
+    """Return decoded track frames (bounding boxes) for the window around one event.
+
+    Reads the run's TRACKS media asset (tracks.jsonl.gz), filters to the event's
+    [start_ms, end_ms] window padded by _TRACKS_WINDOW_PADDING_MS on each side
+    (matching the evidence clip's own padding), and returns plain JSON so the
+    frontend bounding-box overlay can render without any gzip/JSONL parsing
+    library on the client.
+    """
+    event = get_event(session, event_id)
+    if not event:
+        raise ProblemError(
+            status_code=404,
+            code="EVENT_NOT_FOUND",
+            title="Event not found",
+            detail=f"Event with ID {event_id} was not found.",
+        )
+
+    tracks_stmt = select(MediaAssetModel).where(
+        MediaAssetModel.run_id == event.run_id,
+        MediaAssetModel.kind == "TRACKS",
+    )
+    tracks_asset = session.execute(tracks_stmt).scalar_one_or_none()
+    if not tracks_asset:
+        raise ProblemError(
+            status_code=404,
+            code="TRACKS_NOT_FOUND",
+            title="Track data not found",
+            detail=f"No TRACKS asset was found for run {event.run_id}.",
+        )
+
+    try:
+        file_path = resolve_media_path(tracks_asset.relative_path, settings.storage_root_path)
+    except (PathTraversalError, MediaNotFoundError) as err:
+        raise ProblemError(
+            status_code=404,
+            code="TRACKS_NOT_FOUND",
+            title="Track file not found",
+            detail=str(err),
+        ) from err
+
+    window_start = max(0, event.start_ms - _TRACKS_WINDOW_PADDING_MS)
+    window_end = event.end_ms + _TRACKS_WINDOW_PADDING_MS
+
+    frames: list[dict[str, Any]] = []
+    with gzip.open(file_path, "rt", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            ts = obj.get("timestamp_ms", 0)
+            if window_start <= ts <= window_end:
+                frames.append(obj)
+
+    return frames
 
 
 @router.post(
